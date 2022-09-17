@@ -296,7 +296,14 @@ export class Pokemon {
 		this.name = set.name.substr(0, 20);
 		this.fullname = this.side.id + ': ' + this.name;
 
-		set.level = this.battle.clampIntRange(set.adjustLevel || set.level || 100, 1, 1000000);
+		const {min: minLevel, max: maxLevel} = side.levelRange;
+
+		set.level = this.battle.clampIntRange(
+			((minLevel !== undefined) || (maxLevel !== undefined)) ?
+				(set.level || this.battle.random(minLevel ?? 1, maxLevel ?? 1000000)) :
+				(set.adjustLevel || set.level || 100), minLevel ?? 1, maxLevel ?? 1000000
+		);
+
 		this.level = set.level;
 		const genders: {[key: string]: GenderName} = {M: 'M', F: 'F', N: 'N'};
 		this.gender = genders[set.gender] || this.species.gender || (this.battle.random() * 2 < 1 ? 'M' : 'F');

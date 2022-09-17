@@ -98,6 +98,7 @@ export class RandomTeams {
 	format: Format;
 	prng: PRNG;
 	noStab: string[];
+	levelRange?: LevelRange;
 	readonly maxTeamSize: number;
 	readonly adjustLevel: number | null;
 	readonly maxMoveCount: number;
@@ -110,11 +111,12 @@ export class RandomTeams {
 	 */
 	moveEnforcementCheckers: {[k: string]: MoveEnforcementChecker};
 
-	constructor(format: Format | string, prng: PRNG | PRNGSeed | null) {
+	constructor(format: Format | string, prng: PRNG | PRNGSeed | null, levelRange?: LevelRange) {
 		format = Dex.formats.get(format);
 		this.dex = Dex.forFormat(format);
 		this.gen = this.dex.gen;
 		this.noStab = NoStab;
+		this.levelRange = levelRange;
 
 		const ruleTable = Dex.formats.getRuleTable(format);
 		this.maxTeamSize = ruleTable.maxTeamSize;
@@ -2239,7 +2241,10 @@ export class RandomTeams {
 		}
 
 		let level: number;
-		if (this.adjustLevel) {
+		if (this.levelRange) {
+			const {min: minLevel, max: maxLevel} = this.levelRange;
+			level = this.random(minLevel ?? 1, maxLevel ?? 1000000);
+		} else if (this.adjustLevel) {
 			level = this.adjustLevel;
 		// doubles levelling
 		} else if (isDoubles && species.randomDoubleBattleLevel) {

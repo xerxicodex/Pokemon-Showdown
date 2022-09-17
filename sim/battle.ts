@@ -2903,6 +2903,9 @@ export class Battle {
 			// edit player
 			side = this.sides[slotNum];
 			didSomething = false;
+
+			side.levelRange = options.levelRange ?? {};
+
 			if (options.name && side.name !== options.name) {
 				side.name = options.name;
 				didSomething = true;

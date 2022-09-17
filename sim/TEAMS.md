@@ -256,7 +256,7 @@ console.log(JSON.stringify(Teams.unpack(
 Random team generator
 ---------------------
 
-`Teams.generate(format: Format | string, options?: {seed: number[4]}): PokemonSet[]`
+`Teams.generate(format: Format | string, options?: {seed: number[4], levelRange: {min: number, max:numer}}): PokemonSet[]`
 
 - Generate a team for a random format
 

@@ -402,8 +402,14 @@ interface PlayerOptions {
 	name?: string;
 	avatar?: string;
 	rating?: number;
+	levelRange?: LevelRange;
 	team?: PokemonSet[] | string | null;
 	seed?: PRNGSeed;
+}
+
+interface LevelRange {
+	min?: number;
+	max?: number;
 }
 
 interface TextObject {

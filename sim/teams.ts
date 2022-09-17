@@ -601,13 +601,13 @@ export const Teams = new class Teams {
 		return sets;
 	}
 
-	getGenerator(format: Format | string, seed: PRNG | PRNGSeed | null = null) {
+	getGenerator(format: Format | string, seed: PRNG | PRNGSeed | null = null, levelRange?: LevelRange) {
 		const TeamGenerator = require(Dex.forFormat(format).dataDir + '/random-teams').default;
-		return new TeamGenerator(format, seed);
+		return new TeamGenerator(format, seed, levelRange);
 	}
 
 	generate(format: Format | string, options: PlayerOptions | null = null): PokemonSet[] {
-		return this.getGenerator(format, options?.seed).getTeam(options);
+		return this.getGenerator(format, options?.seed, options?.levelRange).getTeam(options);
 	}
 };
 

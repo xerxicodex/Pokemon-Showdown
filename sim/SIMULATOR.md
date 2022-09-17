@@ -69,6 +69,8 @@ Starts a battle:
 
 - `seed` - an array of four numbers representing a seed for the random number generator (defaults to a random seed)
 
+- `levelRange` - Set pokemon levels between { min(1), max(1,000,000) } of this value
+
 - `p1` - `PLAYEROPTIONS` for player 1 (defaults to no player; player options must then be passed with `>player p1`)
 
 - `p2` - `PLAYEROPTIONS` for player 2 (defaults to no player; player options must then be passed with `>player p2`)
@@ -94,6 +96,8 @@ Sets player information:
 - `name` is a string for the player name (defaults to "Player 1" or "Player 2")
 
 - `avatar` is a string for the player avatar (defaults to "")
+
+- `levelRange` - Set pokemon levels between { min(1), max(1,000,000) } of this value
 
 - `team` is a team (either in JSON or a string in [packed format][./TEAMS.md])
 
