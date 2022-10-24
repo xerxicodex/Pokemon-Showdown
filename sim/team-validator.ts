@@ -682,20 +682,17 @@ export class TeamValidator {
 				if (eventData.length === 1) {
 					problems.push(`${species.name} is only obtainable from an event - it needs to match its event:`);
 				} else {
-					problems.push(`${species.name} is only obtainable from events - it needs to match one of its events, such as:`);
+					problems.push(`${species.name} is only obtainable from events - it needs to match one of its events:`);
 				}
-				let eventInfo = eventData[0];
-				let eventNum = 1;
 				for (const [i, event] of eventData.entries()) {
 					if (event.generation <= dex.gen && event.generation >= this.minSourceGen) {
-						eventInfo = event;
-						eventNum = i + 1;
-						break;
+						const eventInfo = event;
+						const eventNum = i + 1;
+						const eventName = eventData.length > 1 ? ` #${eventNum}` : ``;
+						const eventProblems = this.validateEvent(set, eventInfo, eventSpecies, ` to be`, `from its event${eventName}`);
+						if (eventProblems) problems.push(...eventProblems);
 					}
 				}
-				const eventName = eventData.length > 1 ? ` #${eventNum}` : ``;
-				const eventProblems = this.validateEvent(set, eventInfo, eventSpecies, ` to be`, `from its event${eventName}`);
-				if (eventProblems) problems.push(...eventProblems);
 			}
 		}
 
@@ -729,24 +726,25 @@ export class TeamValidator {
 			}
 		}
 
-		if (ruleTable.has('obtainablemoves') && species.id === 'keldeo' && set.moves.includes('secretsword') &&
-			this.minSourceGen > 5 && dex.gen <= 7) {
-			problems.push(`${name} has Secret Sword, which is only compatible with Keldeo-Ordinary obtained from Gen 5.`);
-		}
-		const requiresGen3Source = setSources.maxSourceGen() <= 3;
-		if (requiresGen3Source && dex.abilities.get(set.ability).gen === 4 && !species.prevo && dex.gen <= 5) {
-			// Ability Capsule allows this in Gen 6+
-			problems.push(`${name} has a Gen 4 ability and isn't evolved - it can't use moves from Gen 3.`);
-		}
-		const canUseAbilityPatch = dex.gen >= 8 && format.mod !== 'gen8dlc1';
-		if (setSources.isHidden && !canUseAbilityPatch && setSources.maxSourceGen() < 5) {
-			problems.push(`${name} has a Hidden Ability - it can't use moves from before Gen 5.`);
-		}
-		if (
-			species.maleOnlyHidden && setSources.isHidden && setSources.sourcesBefore < 5 &&
-			setSources.sources.every(source => source.charAt(1) === 'E')
-		) {
-			problems.push(`${name} has an unbreedable Hidden Ability - it can't use egg moves.`);
+		if (ruleTable.has('obtainablemoves')) {
+			if (species.id === 'keldeo' && set.moves.includes('secretsword') && this.minSourceGen > 5 && dex.gen <= 7) {
+				problems.push(`${name} has Secret Sword, which is only compatible with Keldeo-Ordinary obtained from Gen 5.`);
+			}
+			const requiresGen3Source = setSources.maxSourceGen() <= 3;
+			if (requiresGen3Source && dex.abilities.get(set.ability).gen === 4 && !species.prevo && dex.gen <= 5) {
+				// Ability Capsule allows this in Gen 6+
+				problems.push(`${name} has a Gen 4 ability and isn't evolved - it can't use moves from Gen 3.`);
+			}
+			const canUseAbilityPatch = dex.gen >= 8 && format.mod !== 'gen8dlc1';
+			if (setSources.isHidden && !canUseAbilityPatch && setSources.maxSourceGen() < 5) {
+				problems.push(`${name} has a Hidden Ability - it can't use moves from before Gen 5.`);
+			}
+			if (
+				species.maleOnlyHidden && setSources.isHidden && setSources.sourcesBefore < 5 &&
+				setSources.sources.every(source => source.charAt(1) === 'E')
+			) {
+				problems.push(`${name} has an unbreedable Hidden Ability - it can't use egg moves.`);
+			}
 		}
 
 		if (teamHas) {
@@ -1114,6 +1112,9 @@ export class TeamValidator {
 		let eggGroups = species.eggGroups;
 		if (species.id === 'nidoqueen' || species.id === 'nidorina') {
 			eggGroups = dex.species.get('nidoranf').eggGroups;
+		} else if (species.id === 'shedinja') {
+			// Shedinja and Nincada are different Egg groups; Shedinja itself is genderless
+			eggGroups = dex.species.get('nincada').eggGroups;
 		} else if (dex !== this.dex) {
 			// Gen 1 tradeback; grab the egg groups from Gen 2
 			eggGroups = dex.species.get(species.id).eggGroups;

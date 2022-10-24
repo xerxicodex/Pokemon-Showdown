@@ -201,8 +201,11 @@ async function getQuestions(
 	} else {
 		const questions = [];
 		for (const category of categories) {
-			if (category === 'all') questions.push(...await database.getQuestions('all', limit, {order}));
-			if (!ALL_CATEGORIES[category]) throw new Chat.ErrorMessage(`"${category}" is an invalid category.`);
+			if (category === 'all') {
+				questions.push(...await database.getQuestions('all', limit, {order}));
+			} else if (!ALL_CATEGORIES[category]) {
+				throw new Chat.ErrorMessage(`"${category}" is an invalid category.`);
+			}
 		}
 		return database.getQuestions(categories.filter(c => c !== 'all'), limit, {order});
 	}
@@ -384,12 +387,12 @@ export class Trivia extends Rooms.RoomGame<TriviaPlayer> {
 		this.canLateJoin = true;
 
 		this.categories = categories;
-		let category = this.categories
+		const uniqueCategories = new Set(this.categories
 			.map(cat => {
 				if (cat === 'all') return 'All';
 				return ALL_CATEGORIES[CATEGORY_ALIASES[cat] || cat];
-			})
-			.join(' + ');
+			}));
+		let category = [...uniqueCategories].join(' + ');
 		if (isRandomCategory) category = this.room.tr`Random (${category})`;
 
 
